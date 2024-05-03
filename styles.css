@@ -1,0 +1,43 @@
+body {
+    display: grid;
+    grid-template-rows: auto 1fr auto; /* Header, Main Content, Footer */
+    grid-template-columns: 1fr 4fr; /* Sidebar, Main Content */
+    height: 100vh; /* Full height of the viewport */
+}
+
+.header, .sidebar, .main, .footer {
+    border: 1px solid black; /* Add border */
+    padding: 10px; /* Add padding */
+    margin: 5px; /* Add margin */
+}
+
+.header {
+    grid-row: 1; /* Header occupies the first row */
+    grid-column: 1 / span 2; /* Header spans across both columns */
+}
+
+.sidebar {
+    grid-row: 2; /* Sidebar is in the second row */
+    grid-column: 1; /* Sidebar is in the first column */
+}
+
+.main {
+    grid-row: 2; /* Main content is in the second row */
+    grid-column: 2; /* Main content is in the second column */
+}
+
+.footer {
+    grid-row: 3; /* Footer occupies the last row */
+    grid-column: 1 / span 2; /* Footer spans across both columns */
+}
+.header h1{
+    position: relative;
+    left: 500px;
+}
+
+.header p{
+    display: inline; /* or inline-block */
+    left: 160px;
+    position: relative;
+    margin: 0 100px; /* Add some margin between the paragraphs */
+}
