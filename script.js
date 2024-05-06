@@ -5,7 +5,5 @@ const supabase = createClient('https://nrhduozvejvryiwnksik.supabase.co', 'eyJhb
 async function fetchData() {
     const { data, error
 } = await supabase.from('People').select();
-console.log('fetched data:', data);
 }
-
 fetchData();
