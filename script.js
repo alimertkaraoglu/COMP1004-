@@ -10,48 +10,84 @@ async function fetchData() {
     const licenseNumber = document.getElementById('license_number').value.trim();
 
     try {
-        let query = supabase.from('People').select();
+        let personQuery = supabase.from('People').select();
 
         if (driverName) {
-            query = query.eq('Name', driverName);
+            personQuery = personQuery.ilike('Name', `%${driverName}%`);
         }
 
-    
+        
+        console.log('driver name:' + driverName);
         if (licenseNumber) {
-            query = query.eq('LicenseNumber', licenseNumber);
+            personQuery = personQuery.eq('LicenseNumber', licenseNumber);
         }
 
-        const { data: peopleData, error: peopleError } = await query;
+        const { data: peopleData, error: peopleError } = await personQuery;
 
         if (peopleError) {
             throw new Error(peopleError.message);
         }
+        
+        if (peopleData.length === 0) {
+            displayData([], []);
+            return;
+        }
 
-        displayData(peopleData);
+        
+        const personID = peopleData[0].PersonID;
+
+        
+        const vehicleQuery = supabase.from('Vehicles').select().eq('OwnerID', personID);
+        const { data: vehiclesData, error: vehiclesError } = await vehicleQuery;
+
+        // if (vehiclesError) {
+        //     throw new Error(vehiclesError.message);
+        // }
+
+        console.log("hello");  
+        displayData(peopleData, vehiclesData);
     } catch (error) {
         console.error('Error fetching data:', error.message);
     }
 }
 
-function displayData(data) {
+function displayData(peopleData, vehiclesData) {
     const resultsContainer = document.getElementById('results');
-    resultsContainer.innerHTML = ''; 
-
-    if (data.length === 0) {
-        resultsContainer.textContent = 'No results found';
-        return;
-    }
-
-    data.forEach(person => {
-        const personInfo = document.createElement('div');
-        personInfo.innerHTML = `
-            <p>Driver Name: ${person.Name}</p>
-            <p>Address: ${person.Address}<p>
-            <p>DOB: ${person.DOB}<p>
-            <p>License Number: ${person.LicenseNumber}</p>
-            <p>ExpiryDate: ${person.ExpiryDate}<p>
-            <!-- Add more fields as needed -->
+    resultsContainer.innerHTML = '';
+    console.log("people" + peopleData.length)
+    for (let i = 0; i < peopleData.length; i++) {
+        console.log(i);
+        if (peopleData.length > 0) {
+            console.log(vehiclesData[i]);
+            const personInfo = document.createElement('div');
+            if (vehiclesData[i]) {
+                personInfo.innerHTML = `
+            <h2>Person Details:</h2>
+            <p>Driver Name: ${peopleData[i].Name}</p>
+            <p>Address: ${peopleData[i].Address}</p>
+            <p>DOB: ${peopleData[i].DOB}</p>
+            <p>License Number: ${peopleData[i].LicenseNumber}</p>
+            <p>Expiry Date: ${peopleData[i].ExpiryDate}</p>
+            <h2>Vehicle Details:</h2>
+            <p>Vehicle ID: ${vehiclesData[i].VehicleID}</p>
+            <!-- Add more vehicle fields as needed -->
         `;
-        resultsContainer.appendChild(personInfo);
-    });
+            } else {
+                personInfo.innerHTML = `
+            <h2>Person Details:</h2>
+            <p>Driver Name: ${peopleData[i].Name}</p>
+            <p>Address: ${peopleData[i].Address}</p>
+            <p>DOB: ${peopleData[i].DOB}</p>
+            <p>License Number: ${peopleData[i].LicenseNumber}</p>
+            <p>Expiry Date: ${peopleData[i].ExpiryDate}</p>
+            <h2>Vehicle Details:</h2>
+            <p>Vehicle ID:</p>
+            <!-- Add more vehicle fields as needed -->
+        `;
+            }
+            resultsContainer.appendChild(personInfo);
+        } else {
+            resultsContainer.innerHTML = '<p>No results found</p>';
+        }
+    }
 }
